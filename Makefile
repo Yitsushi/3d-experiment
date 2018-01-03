@@ -1,8 +1,8 @@
 CC= g++
 CFLAGS= -g -c -Wall -std=c++0x -stdlib=libc++
 LDFLAGS= -lglfw -framework OpenGL
-SOURCES= main.cpp
-INCLUDES= -I.
+SOURCES= src/main.cpp src/core/application.cpp src/graphics/shader.cpp
+INCLUDES= -Isrc
 OBJECTS= $(SOURCES:.cpp=.o)
 TARGET= bin/app
 

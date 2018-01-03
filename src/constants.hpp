@@ -7,4 +7,8 @@
 #define PI 3.14159265
 #define APP_NAME "Engine"
 
+#ifndef DEBUG
+#define DEBUG 1
+#endif
+
 #endif

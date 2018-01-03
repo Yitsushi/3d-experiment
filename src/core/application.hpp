@@ -1,5 +1,5 @@
-#ifndef _APPLICATION_HPP_
-#define _APPLICATION_HPP_
+#ifndef _CORE_APPLICATION_HPP_
+#define _CORE_APPLICATION_HPP_
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>

@@ -3,6 +3,5 @@
 int main() {
     Core::Application();
 
-
     return 0;
 }

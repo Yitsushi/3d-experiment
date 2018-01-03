@@ -1,5 +1,7 @@
-#ifndef _SHADERS_HPP_
-#define _SHADERS_HPP_
+#ifndef _GRAPHICS_SHADERS_HPP_
+#define _GRAPHICS_SHADERS_HPP_
+
+#include <GLFW/glfw3.h>
 
 namespace Graphics {
     class Shader {

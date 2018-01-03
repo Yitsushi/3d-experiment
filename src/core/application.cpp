@@ -14,7 +14,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "core/application.hpp"
-#include "graphics/shader.hpp"
+#include "graphics/shader_store.hpp"
 
 namespace Core {
     Application::Application() {
@@ -35,9 +35,9 @@ namespace Core {
         glGenVertexArrays(1, &VertexArrayID);
         glBindVertexArray(VertexArrayID);
 
-        GLuint programID = Graphics::Shader::LoadShaders( "simple.vertexshader", "simple.fragmentshader" );
+        Graphics::ShaderStore::Register("simple", "simple.vertexshader", "simple.fragmentshader");
 
-        GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+        GLuint MatrixID = glGetUniformLocation(Graphics::ShaderStore::Get("simple"), "MVP");
         glm::mat4 MVP = GetMVP();
 
         GLfloat g_vertex_buffer_data[] = {
@@ -59,6 +59,7 @@ namespace Core {
         do {
             timer = (timer + 1) % 360;
             float deg = ((timer) * PI/180) * 6;
+
             g_vertex_buffer_data[2] = sin(deg);
             g_vertex_buffer_data[5] = -sin(deg);
             g_vertex_buffer_data[8] = cos(deg);
@@ -66,6 +67,8 @@ namespace Core {
             g_color_buffer_data[0] = (abs(cos(deg)) + 4) * 0.2;
             g_color_buffer_data[4] = (abs(sin(deg)) + 4) * 0.2;
             g_color_buffer_data[8] = (abs(-sin(deg)) + 4) * 0.2;
+
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             glGenBuffers(1, &vertexbuffer);
             glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -75,9 +78,7 @@ namespace Core {
             glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
             glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            glUseProgram(programID);
+            glUseProgram(Graphics::ShaderStore::Get("simple"));
             glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
             glEnableVertexAttribArray(0);
@@ -99,11 +100,14 @@ namespace Core {
 
         glDeleteBuffers(1, &vertexbuffer);
         glDeleteBuffers(1, &colorbuffer);
-        glDeleteProgram(programID);
+        Graphics::ShaderStore::Clear();
         glDeleteVertexArrays(1, &VertexArrayID);
 
         glfwTerminate();
     }
+
+    //void Application::AddBuffer(int layout, GLfloat[] * data, int size) {
+    //}
 
     void Application::setup() {
 #ifdef __APPLE__

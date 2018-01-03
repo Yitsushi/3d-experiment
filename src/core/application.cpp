@@ -15,6 +15,7 @@
 
 #include "core/application.hpp"
 #include "graphics/shader_store.hpp"
+#include "graphics/vertex_buffer_store.hpp"
 
 namespace Core {
     Application::Application() {
@@ -52,8 +53,7 @@ namespace Core {
             0.0f,  0.0f,  1.0f,
         };
 
-        GLuint vertexbuffer;
-        GLuint colorbuffer;
+        Graphics::VertexBufferStore *bufferStore = new Graphics::VertexBufferStore();
 
         int timer = 0;
         do {
@@ -70,44 +70,26 @@ namespace Core {
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            glGenBuffers(1, &vertexbuffer);
-            glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
-            glGenBuffers(1, &colorbuffer);
-            glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
-
             glUseProgram(Graphics::ShaderStore::Get("simple"));
             glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
-            glEnableVertexAttribArray(0);
-            glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+            bufferStore->Add("vertex", 0, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, 3);
+            bufferStore->Add("color", 1, sizeof(g_color_buffer_data), g_color_buffer_data, 3);
 
-            glEnableVertexAttribArray(1);
-            glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+            glDrawArrays(GL_TRIANGLES, 0, (sizeof(g_vertex_buffer_data) / sizeof(*g_vertex_buffer_data) / 3));
 
-            glDrawArrays(GL_TRIANGLES, 0, 3);
-
-            glDisableVertexAttribArray(0);
-            glDisableVertexAttribArray(1);
+            bufferStore->DisableAll();
 
             glfwSwapBuffers(m_window);
             glfwPollEvents();
         } while( glfwGetKey(m_window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && glfwWindowShouldClose(m_window) == 0 );
 
-        glDeleteBuffers(1, &vertexbuffer);
-        glDeleteBuffers(1, &colorbuffer);
+        bufferStore->Clear();
         Graphics::ShaderStore::Clear();
         glDeleteVertexArrays(1, &VertexArrayID);
 
         glfwTerminate();
     }
-
-    //void Application::AddBuffer(int layout, GLfloat[] * data, int size) {
-    //}
 
     void Application::setup() {
 #ifdef __APPLE__

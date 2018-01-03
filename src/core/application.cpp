@@ -33,6 +33,10 @@ namespace Core {
             throw std::runtime_error("Failed to open GLFW window.");
         }
 
+        glfwPollEvents();
+        updateScreenSize();
+        glfwSetCursorPos(m_window, screenSize.x/2, screenSize.y/2);
+
         bufferStore = new Graphics::VertexBufferStore();
 
         glGenVertexArrays(1, &VertexArrayID);
@@ -41,12 +45,17 @@ namespace Core {
         Graphics::ShaderStore::Register("simple", "simple.vertexshader", "simple.fragmentshader");
 
         GLuint MatrixID = glGetUniformLocation(Graphics::ShaderStore::Get("simple"), "MVP");
-        glm::mat4 MVP = GetMVP();
+
+        camera = new Object::Camera();
 
         std::vector<glm::vec3> vertex_data{
             glm::vec3(-1.0f,  -1.0f,  0.0f),
             glm::vec3(1.0f,  -1.0f,  0.0f),
             glm::vec3(0.0f,  1.0f,  0.0f),
+
+            glm::vec3(-2.0f,  -2.0f,  -1.0f),
+            glm::vec3(0.0f,  -2.0f,  -1.0f),
+            glm::vec3(-1.0f,  0.0f,  -1.0f),
         };
 
         std::vector<glm::vec3> color_data{
@@ -57,6 +66,10 @@ namespace Core {
 
         int timer = 0;
         do {
+            glfwPollEvents();
+            HandleInput();
+
+            glm::mat4 MVP = camera->MVP();
             timer = (timer + 1) % 360;
             float deg = ((timer) * PI/180) * 6;
 
@@ -81,7 +94,6 @@ namespace Core {
             bufferStore->DisableAll();
 
             glfwSwapBuffers(m_window);
-            glfwPollEvents();
         } while( glfwGetKey(m_window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && glfwWindowShouldClose(m_window) == 0 );
     }
 
@@ -117,6 +129,7 @@ namespace Core {
         glfwMakeContextCurrent(window);
 
         glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glClearColor(0.0f, 0.4f, 0.5f, 0.0f);
 
         glEnable(GL_DEPTH_TEST);
@@ -125,16 +138,28 @@ namespace Core {
         return window;
     }
 
-    glm::mat4 Application::GetMVP() {
-        glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
-        glm::mat4 View = glm::lookAt(
-                glm::vec3(0,0,5), // position
-                glm::vec3(0,0,0), // loot at
-                glm::vec3(0,1,0)  // head is up
-                );
-        glm::mat4 Model = glm::mat4(1.0f);
-        glm::mat4 MVP = Projection * View * Model;
+    void Application::HandleInput() {
+        double xpos, ypos;
+        glfwGetCursorPos(m_window, &xpos, &ypos);
+        glfwSetCursorPos(m_window, screenSize.x/2, screenSize.y/2);
 
-        return MVP;
+        float factor = 0.002f * deltaTime();
+        camera->AddRelativeOrientation(
+            factor * float(screenSize.x/2 - xpos),
+            factor * float(screenSize.y/2 - ypos)
+        );
+    }
+
+    void Application::updateScreenSize() {
+        int w, h;
+        glfwGetWindowSize(m_window, &w, &h);
+        screenSize.x = w;
+        screenSize.y = h;
+    }
+
+    float Application::deltaTime() {
+        static double lastTime = glfwGetTime();
+
+        return float(glfwGetTime() - lastTime);
     }
 }

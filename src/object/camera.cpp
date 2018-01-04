@@ -12,7 +12,7 @@ namespace Object {
         position = glm::vec3(0.0f, 0.0f, 5.0f);
         angle = glm::vec2(3.14f, 0.0f);
         fov = DEFAULT_FOV;
-        speed = 3.0f;
+        speed = 0.03f;
     }
 
     glm::vec3 Camera::Position() {
@@ -28,21 +28,11 @@ namespace Object {
     }
 
     glm::mat4 Camera::View() {
-        glm::vec3 direction = glm::vec3(
-                cos(angle.y) * sin(angle.x),
-                sin(angle.y),
-                cos(angle.y) * cos(angle.x)
-        );
-        glm::vec3 right = glm::vec3(
-            sin(angle.x - PI/2.0f),
-            0,
-            cos(angle.x - PI/2.0f)
-        );
-        glm::vec3 up = glm::cross( right, direction );
+        glm::vec3 up = glm::cross( RelativeRight(), Direction() );
 
         return glm::lookAt(
                 position,
-                position + direction,
+                position + Direction(),
                 up
         );
     }
@@ -55,8 +45,32 @@ namespace Object {
         return Perspective() * View() * Model();
     }
 
+    glm::vec3 Camera::RelativeRight() {
+        return glm::vec3(
+            sin(angle.x - PI/2.0f),
+            0,
+            cos(angle.x - PI/2.0f)
+        );
+    }
+
+    glm::vec3 Camera::Direction() {
+        return glm::vec3(
+            cos(angle.y) * sin(angle.x),
+            sin(angle.y),
+            cos(angle.y) * cos(angle.x)
+        );
+    }
+
     void Camera::AddRelativeOrientation(float x, float y) {
         angle.x += x;
         angle.y += y;
+    }
+
+    void Camera::Move(glm::vec3 value, bool negate) {
+        if (negate) {
+            position -= value * speed;
+        } else {
+            position += value * speed;
+        }
     }
 }

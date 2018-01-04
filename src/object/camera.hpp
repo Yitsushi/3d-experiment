@@ -20,7 +20,11 @@ namespace Object {
             glm::mat4 Perspective();
             glm::mat4 View();
             glm::mat4 Model();
+            glm::vec3 Direction();
+            glm::vec3 RelativeRight();
             void AddRelativeOrientation(float, float);
+            void Move(glm::vec3, bool);
+
     };
 }
 

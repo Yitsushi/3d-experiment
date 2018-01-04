@@ -139,15 +139,31 @@ namespace Core {
     }
 
     void Application::HandleInput() {
+
+        // Mouse
         double xpos, ypos;
         glfwGetCursorPos(m_window, &xpos, &ypos);
         glfwSetCursorPos(m_window, screenSize.x/2, screenSize.y/2);
 
-        float factor = 0.002f * deltaTime();
+        float factor = 0.0008f * deltaTime();
         camera->AddRelativeOrientation(
             factor * float(screenSize.x/2 - xpos),
             factor * float(screenSize.y/2 - ypos)
         );
+
+        // Keyboard
+        if (glfwGetKey(m_window, 'W') == GLFW_PRESS) {
+            camera->Move(camera->Direction() * deltaTime(), false);
+        }
+        if (glfwGetKey(m_window, 'S') == GLFW_PRESS) {
+            camera->Move(camera->Direction() * deltaTime(), true);
+        }
+        if (glfwGetKey(m_window, 'D') == GLFW_PRESS) {
+            camera->Move(camera->RelativeRight() * deltaTime(), false);
+        }
+        if (glfwGetKey(m_window, 'A') == GLFW_PRESS) {
+            camera->Move(camera->RelativeRight() * deltaTime(), true);
+        }
     }
 
     void Application::updateScreenSize() {

@@ -1,5 +1,6 @@
 #include "object/camera.hpp"
 #include "constants.hpp"
+#include "util/timer.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -61,16 +62,34 @@ namespace Object {
         );
     }
 
-    void Camera::AddRelativeOrientation(float x, float y) {
-        angle.x += x;
-        angle.y += y;
-    }
-
     void Camera::Move(glm::vec3 value, bool negate) {
         if (negate) {
             position -= value * speed;
         } else {
             position += value * speed;
         }
+    }
+
+    void Camera::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+        if (xoffset == 0.0f) {
+            return;
+        }
+
+        fov -= xoffset;
+
+        if (fov > DEFAULT_FOV) {
+            fov = DEFAULT_FOV;
+        } else if (fov < 20.0f) {
+            fov = 20.0f;
+        }
+    }
+
+    void Camera::MousePositionCallback(GLFWwindow* window, double xpos, double ypos) {
+        float factor = 0.0008f * Util::Timer::DeltaTime();
+        int sw, sh;
+        glfwGetWindowSize(window, &sw, &sh);
+
+        angle.x += factor * float(sw/2 - xpos);
+        angle.y += factor * float(sh/2 - ypos);
     }
 }

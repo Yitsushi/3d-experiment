@@ -1,6 +1,7 @@
 #ifndef _OBJECT_CAMERA_HPP_
 #define _OBJECT_CAMERA_HPP_
 
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
 #define DEFAULT_FOV 45.0f
@@ -22,9 +23,11 @@ namespace Object {
             glm::mat4 Model();
             glm::vec3 Direction();
             glm::vec3 RelativeRight();
-            void AddRelativeOrientation(float, float);
+
             void Move(glm::vec3, bool);
 
+            void ScrollCallback(GLFWwindow*, double, double);
+            void MousePositionCallback(GLFWwindow*, double, double);
     };
 }
 

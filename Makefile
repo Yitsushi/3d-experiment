@@ -6,6 +6,8 @@ SOURCES= src/main.cpp \
 		 src/graphics/shader_store.cpp \
 		 src/graphics/vertex_buffer_store.cpp \
 		 src/object/camera.cpp \
+		 src/util/callback_wrapper.cpp \
+		 src/util/timer.cpp \
 		 src/core/application.cpp
 INCLUDES= -Isrc
 OBJECTS= $(SOURCES:.cpp=.o)

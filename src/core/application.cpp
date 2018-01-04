@@ -17,6 +17,8 @@
 #include "core/application.hpp"
 #include "graphics/shader_store.hpp"
 #include "graphics/vertex_buffer_store.hpp"
+#include "util/callback_wrapper.hpp"
+#include "util/timer.hpp"
 
 namespace Core {
     Application::Application() {
@@ -34,8 +36,12 @@ namespace Core {
         }
 
         glfwPollEvents();
-        updateScreenSize();
-        glfwSetCursorPos(m_window, screenSize.x/2, screenSize.y/2);
+
+        {
+            int sw, sh;
+            glfwGetWindowSize(m_window, &sw, &sh);
+            glfwSetCursorPos(m_window, sw/2, sh/2);
+        }
 
         bufferStore = new Graphics::VertexBufferStore();
 
@@ -47,6 +53,17 @@ namespace Core {
         GLuint MatrixID = glGetUniformLocation(Graphics::ShaderStore::Get("simple"), "MVP");
 
         camera = new Object::Camera();
+        Util::CallbackWrapper::SetCamera(camera);
+
+        glfwSetScrollCallback(
+                m_window,
+                Util::CallbackWrapper::ScrollCallback
+        );
+
+        glfwSetCursorPosCallback(
+                m_window,
+                Util::CallbackWrapper::MousePositionCallback
+        );
 
         std::vector<glm::vec3> vertex_data{
             glm::vec3(-1.0f,  -1.0f,  0.0f),
@@ -139,43 +156,18 @@ namespace Core {
     }
 
     void Application::HandleInput() {
-
-        // Mouse
-        double xpos, ypos;
-        glfwGetCursorPos(m_window, &xpos, &ypos);
-        glfwSetCursorPos(m_window, screenSize.x/2, screenSize.y/2);
-
-        float factor = 0.0008f * deltaTime();
-        camera->AddRelativeOrientation(
-            factor * float(screenSize.x/2 - xpos),
-            factor * float(screenSize.y/2 - ypos)
-        );
-
         // Keyboard
-        if (glfwGetKey(m_window, 'W') == GLFW_PRESS) {
-            camera->Move(camera->Direction() * deltaTime(), false);
+        if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS) {
+            camera->Move(camera->Direction() * Util::Timer::DeltaTime(), false);
         }
-        if (glfwGetKey(m_window, 'S') == GLFW_PRESS) {
-            camera->Move(camera->Direction() * deltaTime(), true);
+        if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS) {
+            camera->Move(camera->Direction() * Util::Timer::DeltaTime(), true);
         }
-        if (glfwGetKey(m_window, 'D') == GLFW_PRESS) {
-            camera->Move(camera->RelativeRight() * deltaTime(), false);
+        if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS) {
+            camera->Move(camera->RelativeRight() * Util::Timer::DeltaTime(), false);
         }
-        if (glfwGetKey(m_window, 'A') == GLFW_PRESS) {
-            camera->Move(camera->RelativeRight() * deltaTime(), true);
+        if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS) {
+            camera->Move(camera->RelativeRight() * Util::Timer::DeltaTime(), true);
         }
-    }
-
-    void Application::updateScreenSize() {
-        int w, h;
-        glfwGetWindowSize(m_window, &w, &h);
-        screenSize.x = w;
-        screenSize.y = h;
-    }
-
-    float Application::deltaTime() {
-        static double lastTime = glfwGetTime();
-
-        return float(glfwGetTime() - lastTime);
     }
 }

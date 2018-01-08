@@ -6,6 +6,8 @@
 #include "graphics/vertex_buffer_store.hpp"
 #include "object/camera.hpp"
 
+#define OBJECT_DIR "objects"
+
 namespace Core {
     class Application {
         GLFWwindow* m_window;

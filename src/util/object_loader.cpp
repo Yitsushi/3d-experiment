@@ -19,19 +19,19 @@ namespace Util {
     // - More secure. Change another line and you can inject code.
     // - Loading from memory, stream, etc
     bool ObjectLoader::load(
-        const char * path,
+        std::string path,
         std::vector<glm::vec3> & out_vertices,
         std::vector<glm::vec2> & out_uvs,
         std::vector<glm::vec3> & out_normals
     ) {
-        printf("Loading OBJ file %s...\n", path);
+        printf("Loading OBJ file %s...\n", path.c_str());
 
         std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
         std::vector<glm::vec3> temp_vertices; 
         std::vector<glm::vec2> temp_uvs;
         std::vector<glm::vec3> temp_normals;
 
-        FILE * file = fopen(path, "r");
+        FILE * file = fopen(path.c_str(), "r");
         if( file == NULL ){
             printf("Impossible to open the file ! Are you in the right path?\n");
             getchar();
@@ -115,15 +115,15 @@ namespace Util {
         return true;
     }
 
-    GLuint ObjectLoader::loadDDS(const char * imagepath) {
+    GLuint ObjectLoader::loadDDS(std::string imagepath) {
         unsigned char header[124];
 
         FILE *fp;
 
         /* try to open the file */
-        fp = fopen(imagepath, "rb");
+        fp = fopen(imagepath.c_str(), "rb");
         if (fp == NULL){
-            printf("%s could not be opened. Are you in the right directory?\n", imagepath);
+            printf("%s could not be opened. Are you in the right directory?\n", imagepath.c_str());
             getchar();
             return 0;
         }

@@ -3,6 +3,8 @@
 
 #include <GLFW/glfw3.h>
 
+#define SHADER_DIR "shaders"
+
 namespace Graphics {
     class Shader {
         public:

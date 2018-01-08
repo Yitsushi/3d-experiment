@@ -11,6 +11,8 @@
 #include <GLFW/glfw3.h>
 
 #include "shader.hpp"
+#include "util/system.hpp"
+#include <stdexcept>
 
 namespace Graphics {
     GLuint Shader::LoadShaders(
@@ -23,21 +25,22 @@ namespace Graphics {
 
         // Read the Vertex Shader code from the file
         std::string VertexShaderCode;
-        std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
+
+        std::ifstream VertexShaderStream(Util::System::PathFor(SHADER_DIR, vertex_file_path).c_str(), std::ios::in);
         if (VertexShaderStream.is_open()) {
             std::string Line = "";
             while(getline(VertexShaderStream, Line))
                 VertexShaderCode += "\n" + Line;
             VertexShaderStream.close();
         } else {
-            printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", vertex_file_path);
+            printf("Impossible to open %s.\n", vertex_file_path);
             getchar();
             return 0;
         }
 
         // Read the Fragment Shader code from the file
         std::string FragmentShaderCode;
-        std::ifstream FragmentShaderStream(fragment_file_path, std::ios::in);
+        std::ifstream FragmentShaderStream(Util::System::PathFor(SHADER_DIR, fragment_file_path).c_str(), std::ios::in);
         if (FragmentShaderStream.is_open()) {
             std::string Line = "";
             while(getline(FragmentShaderStream, Line))

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdexcept>
 #include <vector>
+#include <string>
 
 #include <math.h>
 #include <time.h>
@@ -20,6 +21,7 @@
 #include "util/callback_wrapper.hpp"
 #include "util/timer.hpp"
 #include "util/object_loader.hpp"
+#include "util/system.hpp"
 
 namespace Core {
     Application::Application() {
@@ -70,11 +72,11 @@ namespace Core {
         std::vector<glm::vec2> uvs;
         std::vector<glm::vec3> normals; // Won't be used at the moment.
         Util::ObjectLoader::load(
-            "objects/cube.obj",
+            Util::System::PathFor(OBJECT_DIR, "cube.obj"),
             vertices, uvs, normals
         );
 
-        GLuint Texture = Util::ObjectLoader::loadDDS("objects/cube.DDS");
+        GLuint Texture = Util::ObjectLoader::loadDDS(Util::System::PathFor(OBJECT_DIR, "cube.DDS"));
         GLuint TextureID = glGetUniformLocation(Graphics::ShaderStore::Get("simple"), "simpleTexture");
 
         int timer = 0;

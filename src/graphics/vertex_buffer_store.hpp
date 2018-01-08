@@ -13,6 +13,7 @@ namespace Graphics {
 
         public:
             void Add(const char * name, int layout, std::vector<glm::vec3> data);
+            void Add(const char * name, int layout, std::vector<glm::vec2> data);
             void DisableAll();
             void Clear();
     };

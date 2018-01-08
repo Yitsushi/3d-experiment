@@ -19,6 +19,7 @@
 #include "graphics/vertex_buffer_store.hpp"
 #include "util/callback_wrapper.hpp"
 #include "util/timer.hpp"
+#include "util/object_loader.hpp"
 
 namespace Core {
     Application::Application() {
@@ -65,21 +66,16 @@ namespace Core {
                 Util::CallbackWrapper::MousePositionCallback
         );
 
-        std::vector<glm::vec3> vertex_data{
-            glm::vec3(-1.0f,  -1.0f,  0.0f),
-            glm::vec3(1.0f,  -1.0f,  0.0f),
-            glm::vec3(0.0f,  1.0f,  0.0f),
+        std::vector<glm::vec3> vertices;
+        std::vector<glm::vec2> uvs;
+        std::vector<glm::vec3> normals; // Won't be used at the moment.
+        Util::ObjectLoader::load(
+            "objects/cube.obj",
+            vertices, uvs, normals
+        );
 
-            glm::vec3(-2.0f,  -2.0f,  -1.0f),
-            glm::vec3(0.0f,  -2.0f,  -1.0f),
-            glm::vec3(-1.0f,  0.0f,  -1.0f),
-        };
-
-        std::vector<glm::vec3> color_data{
-            glm::vec3(1.0f,  0.0f,  0.0f),
-            glm::vec3(0.0f,  1.0f,  0.0f),
-            glm::vec3(0.0f,  0.0f,  1.0f),
-        };
+        GLuint Texture = Util::ObjectLoader::loadDDS("objects/cube.DDS");
+        GLuint TextureID = glGetUniformLocation(Graphics::ShaderStore::Get("simple"), "simpleTexture");
 
         int timer = 0;
         do {
@@ -88,25 +84,23 @@ namespace Core {
 
             glm::mat4 MVP = camera->MVP();
             timer = (timer + 1) % 360;
-            float deg = ((timer) * PI/180) * 6;
-
-            vertex_data[0].z = sin(deg);
-            vertex_data[1].z = -sin(deg);
-            vertex_data[2].z = cos(deg);
-
-            color_data[0].r = (abs(cos(deg)) + 4) * 0.2;
-            color_data[1].g = (abs(sin(deg)) + 4) * 0.2;
-            color_data[2].b = (abs(-sin(deg)) + 4) * 0.2;
+            //float deg = ((timer) * PI/180) * 6;
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             glUseProgram(Graphics::ShaderStore::Get("simple"));
             glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
-            bufferStore->Add("vertex", 0, vertex_data);
-            bufferStore->Add("color", 1, color_data);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, Texture);
+            glUniform1i(TextureID, 0);
 
-            glDrawArrays(GL_TRIANGLES, 0, vertex_data.size());
+            bufferStore->Add("vertex", 0, vertices);
+            bufferStore->Add("uv", 1, uvs);
+
+            //bufferStore->Add("color", 1, color_data);
+
+            glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 
             bufferStore->DisableAll();
 

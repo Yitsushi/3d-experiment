@@ -1,11 +1,12 @@
 CC= g++
 CFLAGS= -g -c -Wall -std=c++0x -stdlib=libc++
-LDFLAGS= -lglfw -framework OpenGL
+LDFLAGS= -lglfw -framework OpenGL -framework Carbon
 SOURCES= src/main.cpp \
 		 src/graphics/shader.cpp \
 		 src/graphics/shader_store.cpp \
 		 src/graphics/vertex_buffer_store.cpp \
 		 src/object/camera.cpp \
+		 src/util/object_loader.cpp \
 		 src/util/callback_wrapper.cpp \
 		 src/util/timer.cpp \
 		 src/core/application.cpp
